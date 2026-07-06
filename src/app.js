@@ -55,6 +55,7 @@ app.get("/getOne", async (req, res) => {
     res.send(user)
 })
 
+// Update API
 app.patch("/update/:userId", async (req, res) => {
     const userId = req.params?.userId;
     const data = req.body;
