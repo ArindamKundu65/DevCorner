@@ -1,6 +1,9 @@
 import express from "express";
 import connectDB from "./config/database.js"
 import User from "./models/user.js";
+import { validateSignUpData } from "./utils/validation.js"
+import bcrypt from "bcrypt"
+
 
 const app = express();
 const port = 3000;
@@ -8,17 +11,58 @@ const port = 3000;
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-    const user = new User(req.body);
 
     try {
+        //Validation of data
+        validateSignUpData(req);
+
+        const { firstName, lastName, emailId, password } = req.body;
+
+        const passwordHash = await bcrypt.hash(password, 10);
+        console.log(passwordHash);
+
+
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password: passwordHash
+        })
+
+
+
         await user.save();
         console.log(user)
         res.send("User Added successfully");
     } catch (error) {
-        res.status(404).send(`Error saving the user: ${error.message}`);
+        res.status(404).send(`Error: ${error.message}`);
 
     }
 })
+
+
+app.post("/login",async (req, res)=>{
+    try {
+        const {emailId, password} = req.body;
+
+        const user = await User.findOne({emailId});
+        if (!user) {
+            throw new Error("invalid credentials");
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
+            res.send("Login succesfull");
+        } else {
+            throw new Error("invalid credentials")
+        }
+    } catch (error) {
+        res.status(400).send("ERROR: "+ error.message)
+    }
+})
+
+
+
 
 app.get("/users", async (req, res) => {
     const emailId = req.body.emailId;
@@ -61,14 +105,14 @@ app.patch("/update/:userId", async (req, res) => {
     const data = req.body;
     try {
 
-        const allowedUpdates = 
-        ["photoUrl", "about", "gender", "age", "skills"];
+        const allowedUpdates =
+            ["photoUrl", "about", "gender", "age", "skills"];
 
         const isUpdateAllowed = Object.keys(data).every((k) =>
             allowedUpdates.includes(k)
         );
 
-        if(!isUpdateAllowed) {
+        if (!isUpdateAllowed) {
             throw new Error("Update not allowed");
         }
 
