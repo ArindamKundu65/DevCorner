@@ -33,7 +33,7 @@ authRouter.post("/signup", async (req, res) => {
 
 
         const savedUser = await user.save();
-        const token = await jwt.sign({_id: savedUser._id}, "Hello", {
+        const token = await jwt.sign({_id: savedUser._id}, process.env.JWT_SECRET, {
             expiresIn: "8h"
         });
         // console.log(token)
@@ -62,7 +62,7 @@ authRouter.post("/login",async (req, res)=>{
         if (isPasswordValid) {
 
 
-            const token = await jwt.sign({_id: user._id}, "Hello", {
+            const token = await jwt.sign({_id: user._id}, process.env.JWT_SECRET , {
                 expiresIn: "8h"
             });
             // console.log(token)
