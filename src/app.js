@@ -14,8 +14,20 @@ const port = process.env.PORT
 
 app.use(express.json());
 app.use(cookieParser())
+const allowedOrigins = [
+    "https://dev-front-ruby.vercel.app",
+    "https://dev-front-elbm8p2op-devcorner.vercel.app",
+    "https://dev-front-5fr143jwk-devcorner.vercel.app"
+];
+
 app.use(cors({
-    origin: "https://dev-front-elbm8p2op-devcorner.vercel.app/",
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true
 }));
 app.use("/",authRouter);
