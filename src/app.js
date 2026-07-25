@@ -23,6 +23,9 @@ app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/", userRouter);
 
+app.get("/", (req, res) => {
+    res.send("DevCorner Backend is running");
+});
 
 connectDB()
     .then(() => {
