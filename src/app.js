@@ -7,6 +7,7 @@ import requestRouter from "./routes/request.js";
 import userRouter from "./routes/user.js";
 import cors from "cors"
 import "dotenv/config"
+import paymentRouter from "./routes/payment.js";
 
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/", userRouter);
+app.use("/",paymentRouter);
 
 app.get("/", (req, res) => {
     res.send("DevCorner Backend is running");
