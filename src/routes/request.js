@@ -2,7 +2,7 @@ import express from "express";
 import { userAuth } from "../middlewares/auth.js";
 import  ConnectionRequest  from "../models/connectionRequest.js";
 import User from "../models/user.js";
-import { sendConnectionRequestEmail } from "../utils/sendEmail.js";
+// import { sendConnectionRequestEmail } from "../utils/sendEmail.js";
 
 
 const requestRouter = express.Router();
@@ -58,17 +58,17 @@ requestRouter.post(
         if (status === "interested") {
             console.log("Before email");
         
-            try {
-                await sendConnectionRequestEmail(
-                    toUser.emailId,
-                    toUser.firstName,
-                    req.user.firstName
-                );
+            // try {
+            //     await sendConnectionRequestEmail(
+            //         toUser.emailId,
+            //         toUser.firstName,
+            //         req.user.firstName
+            //     );
         
-                console.log("After email");
-            } catch (error) {
-                console.log("Email error:", error);
-            }
+            //     console.log("After email");
+            // } catch (error) {
+            //     console.log("Email error:", error);
+            // }
         }
         
         console.log("Before response");
