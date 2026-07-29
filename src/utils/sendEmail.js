@@ -12,6 +12,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+transporter.verify((error, success) => {
+    if (error) {
+        console.log("Transport error:", error);
+    } else {
+        console.log("Transport is ready");
+    }
+});
+
 export const sendConnectionRequestEmail = async (
     receiverEmail,
     receiverName,
@@ -32,4 +40,5 @@ export const sendConnectionRequestEmail = async (
             <p>Log in to DevCorner to view the request.</p>
         `
     });
+   
 };
