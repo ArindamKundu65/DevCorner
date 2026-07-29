@@ -12,109 +12,76 @@ requestRouter.post(
     "/request/send/:status/:toUserId",
     userAuth,
     async (req, res) => {
-        try {
-            const fromUserId = req.user._id;
-            const toUserId = req.params.toUserId;
-            const status = req.params.status;
-
-            const allowedStatus = ["ignored", "interested"];
-
-            if (!allowedStatus.includes(status)) {
-                return res.status(400).json({
-                    message: "Invalid status type: " + status
-                });
-            }
-
-            const toUser = await User.findById(toUserId);
-
-            if (!toUser) {
-                return res.status(404).json({
-                    message: "User not found"
-                });
-            }
-
-            const existingConnectionRequest =
-                await ConnectionRequest.findOne({
-                    $or: [
-                        {
-                            fromUserId,
-                            toUserId
-                        },
-                        {
-                            fromUserId: toUserId,
-                            toUserId: fromUserId
-                        }
-                    ]
-                });
-
-            if (existingConnectionRequest) {
-                return res.status(400).json({
-                    message: "Connection Request Already Exist!!"
-                });
-            }
-
-            // If user ignores, don't create a connection request
-            if (status === "ignored") {
-                return res.json({
-                    message: `${req.user.firstName} ignored ${toUser.firstName}`
-                });
-            }
-
-            // Create request only for "interested"
-            const connectionRequest = new ConnectionRequest({
-                fromUserId,
-                toUserId,
-                status
-            });
-
-            const data = await connectionRequest.save();
-
-            // Send email to receiver
-            if (status === "interested") {
-                try {
-                    await sendConnectionRequestEmail(
-                        toUser.emailId,
-                        toUser.firstName,
-                        req.user.firstName
-                    );
-                } catch (error) {
-                    console.error(
-                        "Failed to send connection request email:",
-                        error.message
-                    );
-                }
-            }
-
-            if (status === "interested") {
-                console.log("Sending email to:", toUser.emailId);
-            
-                try {
-                    await sendConnectionRequestEmail(
-                        toUser.emailId,
-                        toUser.firstName,
-                        req.user.firstName
-                    );
-            
-                    console.log("Email sent successfully");
-                } catch (error) {
-                    console.error("Email failed:", error);
-                }
-            }
-
-            res.json({
-                message: `${req.user.firstName} is interested in ${toUser.firstName}`,
-                data
-            });
-
-        } catch (error) {
-            console.error(error);
-
-            res.status(500).json({
-                message: error.message
-            });
+      try {
+        const fromUserId = req.user._id;
+        const { toUserId, status } = req.params;
+  
+        const allowedStatus = ["ignored", "interested"];
+  
+        if (!allowedStatus.includes(status)) {
+          return res.status(400).json({
+            message: "Invalid status type: " + status,
+          });
         }
+  
+        const toUser = await User.findById(toUserId);
+  
+        if (!toUser) {
+          return res.status(404).json({
+            message: "User not found",
+          });
+        }
+  
+        const existingConnectionRequest = await ConnectionRequest.findOne({
+          $or: [
+            { fromUserId, toUserId },
+            { fromUserId: toUserId, toUserId: fromUserId },
+          ],
+        });
+  
+        if (existingConnectionRequest) {
+          return res.status(400).json({
+            message: "Connection Request Already Exists!!",
+          });
+        }
+  
+        const connectionRequest = new ConnectionRequest({
+          fromUserId,
+          toUserId,
+          status,
+        });
+  
+        const data = await connectionRequest.save();
+  
+        if (status === "interested") {
+          try {
+            console.log("Sending email to:", toUser.emailId);
+  
+            await sendConnectionRequestEmail(
+              toUser.emailId,
+              toUser.firstName,
+              req.user.firstName
+            );
+  
+            console.log("Email sent successfully");
+          } catch (error) {
+            console.error("Email failed:", error.message);
+          }
+        }
+  
+        res.json({
+          message: `${req.user.firstName} ${status} ${toUser.firstName}`,
+          data,
+        });
+      } catch (error) {
+        console.error(error);
+  
+        res.status(500).json({
+          message: error.message,
+        });
+      }
     }
-);
+  );
 
 requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, res)=> {
 
