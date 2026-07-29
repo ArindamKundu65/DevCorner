@@ -53,38 +53,72 @@ paymentRouter.post("/payment/create", userAuth, async (req, res)=> {
 
 })
 
-paymentRouter.post("/payment/webhook", async (req, res)=> {
+paymentRouter.post("/payment/webhook", async (req, res) => {
   try {
-    const webhookSignature = req.get("X-Razorpay-Signature"); 
-   const isWebHookValid =  validateWebhookSignature(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET)
+      console.log("Webhook received");
 
-   if (!isWebHookValid) {
-    return res.status(400).json({msg: "Webhook signature is invalid"})
-   }
+      const webhookSignature = req.get("X-Razorpay-Signature");
 
+      const isWebHookValid = validateWebhookSignature(
+          JSON.stringify(req.body),
+          webhookSignature,
+          process.env.RAZORPAY_WEBHOOK_SECRET
+      );
 
-   const paymentDetails = req.body.payload.entity;
+      if (!isWebHookValid) {
+          console.log("Invalid webhook signature");
+          return res.status(400).json({
+              msg: "Webhook signature is invalid"
+          });
+      }
 
-   const payment = await Payment.findOne({orderId: paymentDetails.order_id});
-   payment.status = paymentDetails.status;
-   await payment.save();
+      console.log("Webhook signature valid");
 
-   const user = await User.findOne({_id: payment.userId});
+      const paymentDetails = req.body.payload.entity;
 
+      const payment = await Payment.findOne({
+          orderId: paymentDetails.order_id
+      });
 
-   user.isPremium = true;
-   user.membershipType = payment.notes.memberShipType;
-   await user.save();
+      console.log("Payment:", payment);
 
+      if (!payment) {
+          return res.status(404).json({
+              msg: "Payment not found"
+          });
+      }
 
+      payment.status = paymentDetails.status;
+      await payment.save();
 
-   return res.status(200).json({msg: "Webhook received successfully"})
+      const user = await User.findById(payment.userId);
+
+      console.log("User:", user);
+
+      if (!user) {
+          return res.status(404).json({
+              msg: "User not found"
+          });
+      }
+
+      user.isPremium = true;
+      user.membershipType = payment.notes.memberShipType;
+
+      await user.save();
+
+      console.log("User updated:", user.isPremium);
+
+      return res.status(200).json({
+          msg: "Webhook received successfully"
+      });
 
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: error.message });
-}
-})
+      console.log("Webhook Error:", error);
+      return res.status(500).json({
+          msg: error.message
+      });
+  }
+});
 
 
 export default paymentRouter
