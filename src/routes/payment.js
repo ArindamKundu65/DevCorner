@@ -76,7 +76,9 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 
       console.log("✅ Webhook signature valid");
 
-      const paymentDetails = req.body.payload.entity;
+      // const paymentDetails = req.body.payload.entity;
+
+      const paymentDetails = req.body.payload.payment.entity;
 
       const payment = await Payment.findOne({
           orderId: paymentDetails.order_id
