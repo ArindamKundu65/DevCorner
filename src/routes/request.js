@@ -53,26 +53,32 @@ requestRouter.post(
   
         const data = await connectionRequest.save();
   
+        console.log("✅ Request saved");
+
         if (status === "interested") {
-          try {
-            console.log("Sending email to:", toUser.emailId);
-  
-            await sendConnectionRequestEmail(
-              toUser.emailId,
-              toUser.firstName,
-              req.user.firstName
-            );
-  
-            console.log("Email sent successfully");
-          } catch (error) {
-            console.error("Email failed:", error.message);
-          }
+            console.log("Before email");
+        
+            try {
+                await sendConnectionRequestEmail(
+                    toUser.emailId,
+                    toUser.firstName,
+                    req.user.firstName
+                );
+        
+                console.log("After email");
+            } catch (error) {
+                console.log("Email error:", error);
+            }
         }
-  
+        
+        console.log("Before response");
+        
         res.json({
-          message: `${req.user.firstName} ${status} ${toUser.firstName}`,
-          data,
+            message: `${req.user.firstName} is interested in ${toUser.firstName}`,
+            data
         });
+        
+        console.log("After response");
       } catch (error) {
         console.error(error);
   
