@@ -9,7 +9,7 @@ export const sendConnectionRequestEmail = async (
   senderName
 ) => {
   const response = await resend.emails.send({
-    from: "onboarding@resend.dev",
+  from: "noreply@devcorner.com",
     to: receiverEmail,
     subject: "You have a new connection request",
     html: `
