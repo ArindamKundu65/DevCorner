@@ -8,6 +8,8 @@ import userRouter from "./routes/user.js";
 import cors from "cors"
 import "dotenv/config"
 import paymentRouter from "./routes/payment.js";
+import initializeSocket from "./utils/socket.js";
+import http from "http"
 
 
 const app = express();
@@ -29,11 +31,14 @@ app.get("/", (req, res) => {
     res.send("DevCorner Backend is running");
 });
 
+const server = http.createServer(app);
+initializeSocket(server);
+
 connectDB()
     .then(() => {
         console.log("Database connection established")
 
-        app.listen(port, (req, res) => {
+        server.listen(port, (req, res) => {
             console.log(`Server is listening on port:${port}`)
         })
     }
