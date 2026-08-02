@@ -18,7 +18,7 @@ const port = process.env.PORT
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ["https://dev-front-ruby.vercel.app","http://localhost:5173" ],
+    origin: ["https://devcorner-jqtp.onrender.com","http://localhost:5173" ],
     credentials: true
 }));
 app.use("/",authRouter);
