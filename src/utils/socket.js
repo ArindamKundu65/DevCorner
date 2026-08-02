@@ -8,13 +8,14 @@ const initializeSocket = (server) => {
 
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173"
+            origin: ["http://localhost:7777", 
+                 "https://dev-front-ruby.vercel.app"]
         }
     });
 
     io.on("connection", (socket) => {
         socket.on("joinChat", ({ userId, targetUserId }) => {
-            const roomId = [userId, targetUserId].join("_");
+            const roomId = [userId, targetUserId].sort().join("_");
             console.log("joining room: " + roomId)
             socket.join(roomId);
 
