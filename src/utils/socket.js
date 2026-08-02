@@ -16,7 +16,7 @@ const initializeSocket = (server) => {
     io.on("connection", (socket) => {
         socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
             const roomId = [userId, targetUserId].sort().join("_");
-            console.log(firstName + "joined the room: " + roomId)
+            console.log(firstName + " joined the room: " + roomId)
             socket.join(roomId);
 
         });
@@ -28,7 +28,7 @@ const initializeSocket = (server) => {
             text
           }) => {
             const roomId = [userId, targetUserId].sort().join("_");
-            console.log(firstName+ " " + text);
+            console.log(firstName+":"+ " " + text);
             io.to(roomId).emit("MessageReceived", { firstName, text });
         });
 
