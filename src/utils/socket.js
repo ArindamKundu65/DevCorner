@@ -28,7 +28,7 @@ const initializeSocket = (server) => {
             text
           }) => {
             const roomId = [userId, targetUserId].sort().join("_");
-            console.log(firstName+ " " + newMessage);
+            console.log(firstName+ " " + text);
             io.to(roomId).emit("MessageReceived", { firstName, text });
         });
 
