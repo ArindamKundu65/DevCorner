@@ -29,7 +29,7 @@ const initializeSocket = (server) => {
           }) => {
             const roomId = [userId, targetUserId].sort().join("_");
             console.log(firstName+":"+ " " + text);
-            io.to(roomId).emit("MessageReceived", { firstName, text });
+            io.to(roomId).emit("messageReceived", { firstName, text });
         });
 
         socket.on("disconnect", ()=> {
