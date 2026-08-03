@@ -2,6 +2,10 @@ import { Server } from "socket.io";
 
 
 
+const getSecretRoomId = (userId, targetUserId) => {
+    crypto.createHash("sha256").update([userId, targetUserId].sort().join("_")).digest("hex");
+}
+
 
 const initializeSocket = (server) => {
     console.log("initializeSocket called");
@@ -15,7 +19,7 @@ const initializeSocket = (server) => {
 
     io.on("connection", (socket) => {
         socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
-            const roomId = [userId, targetUserId].sort().join("_");
+            const roomId = getSecretRoomId(userId, targetUserId)
             console.log(firstName + " joined the room: " + roomId)
             socket.join(roomId);
 
@@ -27,7 +31,7 @@ const initializeSocket = (server) => {
             targetUserId,
             text
           }) => {
-            const roomId = [userId, targetUserId].sort().join("_");
+            const roomId = getSecretRoomId(userId, targetUserId)
             console.log(firstName+":"+ " " + text);
             io.to(roomId).emit("messageReceived", { firstName, text });
         });
