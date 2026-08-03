@@ -10,6 +10,7 @@ import "dotenv/config"
 import paymentRouter from "./routes/payment.js";
 import initializeSocket from "./utils/socket.js";
 import http from "http"
+import chatRouter from "./routes/chat.js";
 
 
 const app = express();
@@ -26,6 +27,7 @@ app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/", userRouter);
 app.use("/",paymentRouter);
+app.use("/", chatRouter);
 
 app.get("/", (req, res) => {
     res.send("DevCorner Backend is running");
