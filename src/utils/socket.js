@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import Chat from "../models/chat.js";
 
 
 
@@ -25,14 +26,42 @@ const initializeSocket = (server) => {
 
         });
 
-        socket.on("sendMessage", ( {
+        socket.on("sendMessage", async ( {
             firstName,
             userId,
             targetUserId,
             text
           }) => {
-            const roomId = getSecretRoomId(userId, targetUserId)
-            console.log(firstName+":"+ " " + text);
+           
+
+            try {
+                const roomId = getSecretRoomId(userId, targetUserId)
+                console.log(firstName+":"+ " " + text);
+
+                  //Save messages to the database
+
+                let chat = await Chat.findOne({
+                    participants: { $all: [userId, targetUserId] }
+                })
+
+                if(!chat) {
+                    chat = new Chat({
+                        participants: [userId, targetUserId],
+                        messages: [],
+                    })
+                }
+
+                chat.messages.push({
+                    senderId: userId,
+                    text
+                })
+
+                await chat.save()
+            } catch (error) {
+                console.log(error)
+            }
+
+
             io.to(roomId).emit("messageReceived", { firstName, text });
         });
 
