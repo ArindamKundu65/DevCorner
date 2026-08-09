@@ -6,19 +6,19 @@ import { validateSignUpData, validateEditProfileData } from "../utils/validation
 const profileRouter = express.Router();
 
 
-profileRouter.get("/profile/view",userAuth, async (req,res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
+    try {
+        const user = req.user;
 
-    try
-    {
+        if (!user) {
+            throw new Error("User does not exist");
+        }
+        
+        res.send(user);
 
-    const user = req.user;
-    if(!user) {
-        throw new Error("User does not exist");
+    } catch (error) {
+        res.status(400).send("ERROR: " + error.message);
     }
-    res.send(user);
-}catch (error) {
-    res.status(400).send("ERROR: "+ error.message)
-}
 });
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res)=> {

@@ -5,7 +5,7 @@ import User from "../models/user.js";
 
 const userRouter = express.Router(); 
 
-const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills"
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills membershipType"
 
 
 //Get all the pending connection request for the loggedIn user
